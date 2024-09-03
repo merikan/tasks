@@ -1,0 +1,71 @@
+#:schema https://mise.jdx.dev/schema/mise.json
+
+# ------------------------------------------------------------------------------- #
+# A collection of useful tasks that I am using regardless of project
+#
+# Universal developer tasks for Java, Rust, Go, Gradle, Maven, Cargo, etc.
+#
+# ------------------------------------------------------------------------------- #
+
+# ------------------------------------------------------------------------------- #
+# Tasks
+# ------------------------------------------------------------------------------- #
+[task_config]
+dir = "{{cwd}}"
+
+# ------------------------------------------------------------------------------- #
+# Maven commands
+# ------------------------------------------------------------------------------- #
+["mvn:fmt"]
+  description = "maven: format code"
+  alias = "mf"
+  run = "mvn spotless:apply"
+["mvn:clean"]
+  description = "maven: clean project"
+  alias = "mc"
+  run = "mvn clean"
+["mvn:build"]
+  description = "maven: build project"
+  alias = "mb"
+  run = "mvn package"
+["mvn:test"]
+  description = "maven: run all tests"
+  alias = "mt"
+  run = "mvn verify"
+
+["mvn:dependency:relocated"]
+description = "Check for relocated dependencies with 'oga-maven-plugin'"
+run = "mvn -U biz.lermitage.oga:oga-maven-plugin:check --fail-never"
+["mvn:dependency:tree"]
+description = "Print dependency tree"
+run = "mvn -U dependency:tree -X"
+["mvn:effective-pom"]
+description = "Print effective pom"
+run = "mvn -U help:effective-pom"
+["mvn:build-plan"]
+description = "Print lifecycles, phases, and goals"
+run = "mvn -U fr.jcgay.maven.plugins:buildplan-maven-plugin:list"
+["mvn:openrewrite:deprecated"]
+description = "Find uses of deprecated classes, methods, and fields"
+run = '''
+#!/usr/bin/env bash
+echo "WARNING: This action will update source code with markers."
+read -p "Ensure your repository is clean before continuing. Continue? [y/N] " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+  mvn -U org.openrewrite.maven:rewrite-maven-plugin:run -Drewrite.activeRecipes=org.openrewrite.java.search.FindDeprecatedUses "$@"
+else
+  echo "Aborted."
+  exit 1
+fi
+'''
+["mvn:enforcer:requireReleaseDeps"]
+description = "Checks the dependencies and fails if any snapshots are found."
+run = "mvn -U enforcer:enforce -Drules=requireReleaseDeps"
+["mvn:pilot:pilot"]
+description = "Browse the dependency tree"
+run = "mvn -U eu.maveniverse.maven.plugins:pilot:pilot"
+["mvn:pilot:tree"]
+description = "Browse the dependency tree"
+run = "mvn -U eu.maveniverse.maven.plugins:pilot:tree"
+
